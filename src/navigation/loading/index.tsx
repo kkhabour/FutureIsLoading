@@ -1,15 +1,15 @@
 import React from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Login} from '../../screens';
+import {Loading} from '../../screens';
 
 const Stack = createNativeStackNavigator();
 
-const AuthNavigation: React.FC = () => {
+const LoadingNavigation: React.FC = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Login"
-        component={Login}
+        name="Loading"
+        component={Loading}
         options={{
           headerShown: false,
           animationTypeForReplace: 'pop',
@@ -18,4 +18,5 @@ const AuthNavigation: React.FC = () => {
     </Stack.Navigator>
   );
 };
-export default AuthNavigation;
+
+export default LoadingNavigation;

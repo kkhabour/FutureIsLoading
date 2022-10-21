@@ -1,14 +1,17 @@
 import React, {useCallback} from 'react';
-import {View, Text, Button, StyleSheet, Linking, Alert} from 'react-native';
+import {View, Button, StyleSheet, Linking, Alert} from 'react-native';
 import {Container, Spacer} from '../../components';
-import storage from '../../utils/storage';
+import {Text} from '../../components';
 
-const axios = require('axios').default;
+import {useDispatch} from 'react-redux';
+import {loading, setRedirection} from '../../features/auth/authSlice';
 
 const url =
   'https://api.intra.42.fr/oauth/authorize?client_id=9617a6f6ef1ee55f1af46eb999b7443c51151b901d245e77f11e0ec21392068d&redirect_uri=kkhabour%3A%2F%2Ffutureisloading&response_type=code';
 
 const Login: React.FC = () => {
+  const dispatch = useDispatch();
+
   const handlePress = useCallback(async () => {
     // Checking if the link is supported for links with custom URL scheme.
     const supported = await Linking.canOpenURL(url);
@@ -17,47 +20,11 @@ const Login: React.FC = () => {
       // Opening the link with some app, if the URL scheme is "http" the web link should be opened
       // by some browser in the mobile
       await Linking.openURL(url);
+      dispatch(setRedirection(true));
+      dispatch(loading({loading: true}));
     } else {
       Alert.alert(`Don't know how to open this URL: ${url}`);
     }
-  }, []);
-
-  const handleUrlListener = async (event: any) => {
-    const code = event.url.split('code=')[1];
-
-    try {
-      const response = await axios.post(
-        'https://api.intra.42.fr/oauth/token',
-        null,
-        {
-          params: {
-            grant_type: 'authorization_code',
-            client_id:
-              '9617a6f6ef1ee55f1af46eb999b7443c51151b901d245e77f11e0ec21392068d',
-            client_secret:
-              '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',
-            code: code,
-            redirect_uri: 'kkhabour://futureisloading',
-          },
-        },
-      );
-
-      storage.save({
-        key: 'credentials',
-        data: response.data,
-        expires: 1000 * 3600,
-      });
-
-      //   navigation.navigate('Home');
-    } catch (err: any) {
-      console.log('error =>', err.message);
-    }
-  };
-
-  React.useEffect(() => {
-    Linking.addEventListener('url', handleUrlListener);
-
-    return () => Linking.removeAllListeners('url');
   }, []);
 
   return (
